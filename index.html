@@ -232,6 +232,294 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/11/二分法查找及变种分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="奔跑的犀牛">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://p5f0zxmos.bkt.clouddn.com/image/rhino.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="La La Land">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/11/二分法查找及变种分析/" itemprop="url">二分法查找及变种分析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-11T21:13:32+08:00">
+                2018-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="http://p5f0zxmos.bkt.clouddn.com/15207768290674.jpg" alt=""></p>
+<p>普通二分法查找目标值的index的思路很简单，先确定好列表nums的一头start一尾end，中间值middle根据头尾数值之和用地板除法除以2，即(start + end) // 2。将目标值target与nums[middle]进行比对，这时候有3种结果：</p>
+<ol>
+<li>nums[middle] &gt; target</li>
+<li>nums[middle] &lt; target</li>
+<li>nums[middle] = target</li>
+</ol>
+<p>以上3种情况前2种不断循环，直到满足第3种跳出循环。</p>
+<h3 id="情况1"><a href="#情况1" class="headerlink" title="情况1"></a>情况1</h3><p>说明target在前半段，所以end=middle-1</p>
+<h3 id="情况2"><a href="#情况2" class="headerlink" title="情况2"></a>情况2</h3><p>说明target在后半段，所以start=middle+1</p>
+<h3 id="情况3"><a href="#情况3" class="headerlink" title="情况3"></a>情况3</h3><p>说明target就是nums[middle]，所以返回middle，这是跳出循环的方式之一<br>所以到此可以写出循环体中的代码，基于Python3，下同。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">middle = (start + end) // <span class="number">2</span></span><br><span class="line"><span class="keyword">if</span> target &gt; nums[middle]:</span><br><span class="line">	start = middle + <span class="number">1</span></span><br><span class="line"><span class="keyword">elif</span> target &lt; nums[middle]:</span><br><span class="line">	end = middle - <span class="number">1</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	<span class="keyword">return</span> middle</span><br></pre></td></tr></table></figure>
+<p>但是，万一一直达不到第3种的条件呢？即target压根不在列表nums中，这就出现了情况4</p>
+<h3 id="情况4"><a href="#情况4" class="headerlink" title="情况4"></a>情况4</h3><p>我们循环到最后阶段一定是start=middle-1=end-2，即start与middle与end紧挨着。这时候，我们将start，middle，end代入if语句进行分析，<br>nums[middle] &gt; target,所以赋值end=middle-1，这时end且又和start相等<br>nums[middle] &lt; target,所以赋值start=middle+1，这时start且又和end相等<br>那么此时还有最后一个值需要判断，以上2种情况再代入循环体，此时有start=end=middle。若没有nums[middle]=target，则跳出循环(此为跳出循环的方式之二)返回-1<br>很明显，start与end一直互相逼近，但是start一直小于end的，要不要加上等于这个条件呢？别忘了只有start=end，才能够对列表中的最后一个元素进行判断。</p>
+<p>完整代码如下：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binarySearch</span><span class="params">(nums, target)</span>:</span></span><br><span class="line">   	start = <span class="number">0</span></span><br><span class="line">   	end = len(nums) <span class="number">-1</span></span><br><span class="line">   	<span class="keyword">while</span> start &lt;= end:</span><br><span class="line">   		middle = (start + end) // <span class="number">2</span></span><br><span class="line">   		<span class="keyword">if</span> target &gt; nums[middle]:</span><br><span class="line">   			start = middle + <span class="number">1</span></span><br><span class="line">   		<span class="keyword">elif</span> target &lt; nums[middle]:</span><br><span class="line">   			end = middle - <span class="number">1</span></span><br><span class="line">   		<span class="keyword">else</span>:</span><br><span class="line">   			<span class="keyword">return</span> middle</span><br><span class="line">   	<span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">   	List = [<span class="number">1</span>,<span class="number">4</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">9</span>,<span class="number">10</span>]</span><br><span class="line">   	print(List)</span><br><span class="line">   	print(binarySearch(List, <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># output</span></span><br><span class="line"><span class="comment"># [1, 4, 4, 5, 7, 7, 8, 9, 9, 10]</span></span><br><span class="line"><span class="comment"># 0</span></span><br></pre></td></tr></table></figure>
+<p>变种二分法查找<br>给定一个排序的整数数组（升序）和一个要查找的整数target，用O(logn)的时间查找到target第一次出现的下标（从0开始），如果target不存在于数组中，返回-1。</p>
+<p>普通的二分查找只要找到target就行了，这个必须考虑到列表中重复的元素。<br>也就是说，即便找到了也不能跳出循环体。那么怎样才能跳出循环体呢？<br>别忘了跳出循环的方式有2种，刚才只是封住了第1种，还有第2种呢。即while的设置条件。很明显，start&lt;end是必须的循环条件的，而start&gt;end肯定是跳出循环的条件，那么start=end是跳出还是不跳出呢？首先要清楚start=end的意义是什么，即经过迭代此时列表nums中的选择区域变成了一个元素，循环的作用是将这最后一个元素选出来。<br>跳出循环，去判断是哪种可能。这个元素只有2种可能：不满足target或者是满足target的第一个元素。</p>
+<h3 id="可能一：不满足target的过程"><a href="#可能一：不满足target的过程" class="headerlink" title="可能一：不满足target的过程"></a>可能一：不满足target的过程</h3><p>注意，和普通二分法情况一样，循环到最后阶段一定是start=middle-1=end-2，即start与middle与end紧挨着。这时候，我们将start，middle，end代入if语句进行分析，<br>nums[middle] &gt; target,所以赋值end=middle-1，这时end且又和start相等<br>nums[middle] &lt; target,所以赋值start=middle+1，这时start且又和end相等<br>此时start=end，跳出循环，判断不满足target，需要return -1</p>
+<h3 id="可能二：满足target的第一个元素的过程"><a href="#可能二：满足target的第一个元素的过程" class="headerlink" title="可能二：满足target的第一个元素的过程"></a>可能二：满足target的第一个元素的过程</h3><p>如何确定是满足target的第一个元素？<br>先明白循环中找到第一个等于target的nums[middle]元素不跳出循环应该做什么。很明显，应该搜寻nums[start:middle]区域，所以要赋值end=middle，即搜寻新的nums[start:end]区域。再次循环，此时只剩下2种结果，再找到等于target的nums[middle] 或者 找不到了</p>
+<h4 id="结果1再找到等于target的nums-middle"><a href="#结果1再找到等于target的nums-middle" class="headerlink" title="结果1再找到等于target的nums[middle]"></a>结果1再找到等于target的nums[middle]</h4><p>第一步得到middle = (start + end) // 2<br>有target = nums[middle]<br>赋值end=middle<br>进入新的循环，搜寻新的nums[start:end]区域，依然面临2种结果</p>
+<h4 id="结果2再找不到等于target的nums-middle"><a href="#结果2再找不到等于target的nums-middle" class="headerlink" title="结果2再找不到等于target的nums[middle]"></a>结果2再找不到等于target的nums[middle]</h4><p>第一步得到middle = (start + end) // 2<br>一定有nums[middle] &lt; target而不是nums[middle] &gt; target,因为nums是递增的。<br>此时start = middle + 1<br>进入新的循环，搜寻新的nums[start:end]区域，依然面临2种结果</p>
+<p>2种结果互相交错，循环到最后阶段一定是start=middle-1=end-2，即start与middle与end紧挨着。这时候，我们将start，middle，end代入if语句进行分析，<br>nums[middle] &lt; target,所以赋值start=middle+1，这时start且又和end相等，此时start=end，跳出循环，判断nums[start] == target，需要return start。<br>nums[middle] = target,所以赋值end=middle，得到start=middle-1，再带入循环，有middle = (start + end) // 2，得到start=middle=end-1。<br>此时最后一步又分为二，1若nums[middle] &lt; target,所以赋值start=middle+1，这时start且又和end相等，此时start=end，跳出循环，判断nums[start] == target，需要return start。2若nums[middle] = target,所以赋值end=middle，得到start=middle=end，跳出循环，判断nums[start] == target，需要return start。</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binarySearch</span><span class="params">(nums, target)</span>:</span></span><br><span class="line">   	start = <span class="number">0</span></span><br><span class="line">   	end = len(nums) <span class="number">-1</span></span><br><span class="line">   	<span class="keyword">while</span> start &lt; end:</span><br><span class="line">   		middle = (start + end) // <span class="number">2</span></span><br><span class="line">   		<span class="keyword">if</span> target &gt; nums[middle]:</span><br><span class="line">   			start = middle + <span class="number">1</span></span><br><span class="line">   		<span class="keyword">elif</span> target &lt; nums[middle]:</span><br><span class="line">   			end = middle - <span class="number">1</span></span><br><span class="line">   		<span class="keyword">else</span>:</span><br><span class="line">   			end = middle</span><br><span class="line">   	<span class="keyword">if</span> nums[start] == target:</span><br><span class="line">   		<span class="keyword">return</span> start </span><br><span class="line">   	<span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">   	List = [<span class="number">1</span>,<span class="number">4</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">9</span>,<span class="number">10</span>]</span><br><span class="line">   	print(List)</span><br><span class="line">   	print(binarySearch(List, <span class="number">4</span>))</span><br><span class="line"><span class="comment"># output</span></span><br><span class="line"><span class="comment"># [1, 4, 4, 5, 7, 7, 8, 9, 9, 10]</span></span><br><span class="line"><span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/11/MAC下pyenv和pyenv-virtualenv插件初探/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="奔跑的犀牛">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://p5f0zxmos.bkt.clouddn.com/image/rhino.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="La La Land">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/03/11/MAC下pyenv和pyenv-virtualenv插件初探/" itemprop="url">MAC下pyenv和pyenv-virtualenv插件初探</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-11T19:13:32+08:00">
+                2018-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>![](<a href="http://p5f0zxmos.bkt.clouddn.com/v2-ff9d1b0cb3c7be45eedef970c89fb140_r.jpg）" target="_blank" rel="noopener">http://p5f0zxmos.bkt.clouddn.com/v2-ff9d1b0cb3c7be45eedef970c89fb140_r.jpg）</a></p>
+<h3 id="为什么会使用pyenv和pyenv-virtualenv插件"><a href="#为什么会使用pyenv和pyenv-virtualenv插件" class="headerlink" title="为什么会使用pyenv和pyenv-virtualenv插件?"></a>为什么会使用pyenv和pyenv-virtualenv插件?</h3><p>一般mac自带一个python版本，称为系统版本。对于开发者而言，肯定不够用啦。所以需要在同一个mac上组建不同的开发环境并且不会冲突。<br>pyenv使你可以在不同python版本之间轻松切换。它简单，低调，并且遵守UNIX的传统：single-purpose tools that do one thing well。<br>pyenv是基于rbenv和ruby-build项目，对python做了定制修改。<br>pyenv-virtualenv插件是虚拟出同一版本的python但是不同依赖库版本的开发环境。这对于在同一台电脑上开发不同项目非常方便。<br>pyenv是第三方的，开源的多版本的Python管理工具，同时支持Python2和Python3.<br><strong>等等，难道官方没有类似的工具吗？</strong><br>是有的，在Python3.3标准库中有一个venv模块就是干这个活的，但是，Python3.3之前的版本都不好用，鉴于现在很多项目是基于Python2.x的，所以……<br><strong>等等，似乎我还听说过virtualenv的东西也有类似的功能？</strong><br>virtualenv同时支持Python2和Python3，非常流行。它创建的虚拟环境可以指定Python解释器，并选择不继承基础版本的包。<br><strong>那我还是用virtualenv吧。</strong><br>是可以的，下面聊聊如何安装pyenv及其pyenv-virtualenv插件。</p>
+<p>###安装pyenv</p>
+<p>####通用版<br><strong>1.clone一个pyenv项目</strong><br><code>$ git clone https://github.com/pyenv/pyenv.git ~/.pyenv</code><br><strong>2.定义环境变量</strong><br><code>$ echo &#39;export PYENV_ROOT=&quot;$HOME/.pyenv&quot;&#39; &gt;&gt; ~/.bash_profile
+$ echo &#39;export PATH=&quot;$PYENV_ROOT/bin:$PATH&quot;&#39; &gt;&gt; ~/.bash_profile</code><br>对于zsh，使用~/.zshenv替换~/.bash_profile<br>对于Ubuntu和Fedora，~/.bashrc用替换~/.bash_profile<br><strong>3.增加pyenv init到shell</strong><br><code>$ echo &#39;eval &quot;$(pyenv init -)&quot;&#39; &gt;&gt; ~/.bash_profile</code><br>对于zsh，使用~/.zshenv替换~/.bash_profile<br>对于Ubuntu和Fedora，~/.bashrc用替换~/.bash_profile<br><strong>4.重启shell</strong><br><code>$ exec &quot;$SHELL&quot;</code><br><strong>5.安装Python版本</strong><br><code>$ pyenv install 3.6.2</code></p>
+<h4 id="Mac版"><a href="#Mac版" class="headerlink" title="Mac版"></a>Mac版</h4><p><strong>1.用homebrew安装</strong><br><code>$ brew update
+$ brew install pyenv</code><br><strong>2.按照通用版第3步开始安装</strong></p>
+<p>###安装pyenv-virtualenv插件</p>
+<p>####通用版<br><strong>1.clone一个pyenv项目</strong><br><code>$ git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv</code><br><strong>2.定义环境变量</strong><br><code>$ echo &#39;eval &quot;$(pyenv virtualenv-init -)&quot;&#39; &gt;&gt; ~/.bash_profile</code><br>对于zsh，使用~/.zshenv替换~/.bash_profile<br>对于Ubuntu和Fedora，~/.bashrc用替换~/.bash_profile<br><strong>3.重启shell</strong><br><code>$ exec &quot;$SHELL&quot;</code></p>
+<p>####Mac版<br><strong>1.用homebrew安装</strong><br><code>$ brew install pyenv-virtualenv</code><br><strong>2.同上第2步开始做</strong></p>
+<p>###卸载 pyenv</p>
+<h4 id="通用"><a href="#通用" class="headerlink" title="通用"></a>通用</h4><p><code>rm -rf $(pyenv root)</code></p>
+<p>####Mac<br><code>brew uninstall pyenv</code></p>
+<p>###安装并使用python版本<br><strong>1.查看可用的版本</strong><br><code>$ pyenv  install --list</code><br><strong>2.选择安装一个，如</strong><br><code>$ pyenv install 3.6.2</code></p>
+<blockquote>
+<p>小技巧： 执行上面命令后，会从给定的网址中下载安装文件Python-3.6.2.tar.xz。但由于文件很大，下载需要很久。建议做法是：先执行以上命令然后马上中断安装，这样就知道 pyenv 要下载的文件的链接。然后用户自己用其他更快的方式(比如wget、迅雷等等)从该链接中下载安装文件并将安装文件移动到 ~/.pyenv/cache 目录下(该目录默认不存在，用户要自行新建)，再执行上面的命令。编译安装本身也需要较长时间。默认安装路径是~/.pyenv/versions/3.6.2/</p>
+</blockquote>
+<p><strong>3.查看版本</strong><br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ pyenv versions  (查看所有版本)</span><br><span class="line">* system (<span class="built_in">set</span> by /root/.pyenv/version)</span><br><span class="line">  2.7.13 3.6.2</span><br><span class="line">$ pyenv version   (version 查看当前版本)</span><br><span class="line">system (<span class="built_in">set</span> by /root/.pyenv/version)</span><br></pre></td></tr></table></figure></p>
+<p>system 代表当前系统的python 版本<br>*表示当前的python版本， 可以看到， 我们还在使用的是默认的system 自带的python版本<br><strong>4.切换python默认版本</strong></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ pyenv global 3.6.2</span><br><span class="line">$ pyenv versions</span><br><span class="line">  system</span><br><span class="line">  2.7.1</span><br><span class="line">* 3.6.2 (<span class="built_in">set</span> by /root/.pyenv/version)</span><br></pre></td></tr></table></figure>
+<p><strong>5.创建一个3.6.2的虚拟环境</strong><br><code>$ pyenv virtualenv 3.6.2 env362</code><br>这条命令在本机上创建了一个名为env362python虚拟环境，这个环境的真实目录位于：~/.pyenv/versions/<br>再次输入<br><code>$ pyenv versions</code><br>如图所示</p>
+<p><img src="http://p5f0zxmos.bkt.clouddn.com/v2-35ffe7dc265ad6756aad999d214e7cb6_hd.jpg" alt=""></p>
+<p>env362是3.6.2/envs/env362的软连接<br>3.6.2是官方版本<br><strong>5.使用3.6.2的虚拟环境</strong><br><code>$ pyenv activate env362</code><br>如图所示</p>
+<p><img src="http://p5f0zxmos.bkt.clouddn.com/v2-fb8fb71ab62aa5c85e8db201f4e2f5ac_hd.jpg" alt=""></p>
+<p>下面基本上你就可以在这个虚拟环境里面为所欲为了，再也不用担心系统路径被搞乱的问题了。<br><strong>6.关闭3.6.2的虚拟环境</strong><br><code>$ pyenv deactivate</code><br><strong>7.卸载3.6.2的虚拟环境</strong><br><code>$ pyenv uninstall env362</code></p>
+<p>###在pycharm中使用虚拟环境<br>打开pycharm选择Preferences|Project interpreter|showall就可以选择了。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/11/hexo安装记录/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -338,149 +626,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/11/二分法查找及变种分析/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="奔跑的犀牛">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://p5f0zxmos.bkt.clouddn.com/image/rhino.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="La La Land">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/11/二分法查找及变种分析/" itemprop="url">二分法查找及变种分析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-11T19:13:32+08:00">
-                2018-03-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p><img src="http://p5f0zxmos.bkt.clouddn.com/15207768290674.jpg" alt=""></p>
-<p>普通二分法查找目标值的index的思路很简单，先确定好列表nums的一头start一尾end，中间值middle根据头尾数值之和用地板除法除以2，即(start + end) // 2。将目标值target与nums[middle]进行比对，这时候有3种结果：</p>
-<ol>
-<li>nums[middle] &gt; target</li>
-<li>nums[middle] &lt; target</li>
-<li>nums[middle] = target</li>
-</ol>
-<p>以上3种情况前2种不断循环，直到满足第3种跳出循环。</p>
-<h3 id="情况1"><a href="#情况1" class="headerlink" title="情况1"></a>情况1</h3><p>说明target在前半段，所以end=middle-1</p>
-<h3 id="情况2"><a href="#情况2" class="headerlink" title="情况2"></a>情况2</h3><p>说明target在后半段，所以start=middle+1</p>
-<h3 id="情况3"><a href="#情况3" class="headerlink" title="情况3"></a>情况3</h3><p>说明target就是nums[middle]，所以返回middle，这是跳出循环的方式之一<br>所以到此可以写出循环体中的代码，基于Python3，下同。</p>
-<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">middle = (start + end) // <span class="number">2</span></span><br><span class="line"><span class="keyword">if</span> target &gt; nums[middle]:</span><br><span class="line">	start = middle + <span class="number">1</span></span><br><span class="line"><span class="keyword">elif</span> target &lt; nums[middle]:</span><br><span class="line">	end = middle - <span class="number">1</span></span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">	<span class="keyword">return</span> middle</span><br></pre></td></tr></table></figure>
-<p>但是，万一一直达不到第3种的条件呢？即target压根不在列表nums中，这就出现了情况4</p>
-<h3 id="情况4"><a href="#情况4" class="headerlink" title="情况4"></a>情况4</h3><p>我们循环到最后阶段一定是start=middle-1=end-2，即start与middle与end紧挨着。这时候，我们将start，middle，end代入if语句进行分析，<br>nums[middle] &gt; target,所以赋值end=middle-1，这时end且又和start相等<br>nums[middle] &lt; target,所以赋值start=middle+1，这时start且又和end相等<br>那么此时还有最后一个值需要判断，以上2种情况再代入循环体，此时有start=end=middle。若没有nums[middle]=target，则跳出循环(此为跳出循环的方式之二)返回-1<br>很明显，start与end一直互相逼近，但是start一直小于end的，要不要加上等于这个条件呢？别忘了只有start=end，才能够对列表中的最后一个元素进行判断。</p>
-<p>完整代码如下：</p>
-<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binarySearch</span><span class="params">(nums, target)</span>:</span></span><br><span class="line">   	start = <span class="number">0</span></span><br><span class="line">   	end = len(nums) <span class="number">-1</span></span><br><span class="line">   	<span class="keyword">while</span> start &lt;= end:</span><br><span class="line">   		middle = (start + end) // <span class="number">2</span></span><br><span class="line">   		<span class="keyword">if</span> target &gt; nums[middle]:</span><br><span class="line">   			start = middle + <span class="number">1</span></span><br><span class="line">   		<span class="keyword">elif</span> target &lt; nums[middle]:</span><br><span class="line">   			end = middle - <span class="number">1</span></span><br><span class="line">   		<span class="keyword">else</span>:</span><br><span class="line">   			<span class="keyword">return</span> middle</span><br><span class="line">   	<span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">   	List = [<span class="number">1</span>,<span class="number">4</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">9</span>,<span class="number">10</span>]</span><br><span class="line">   	print(List)</span><br><span class="line">   	print(binarySearch(List, <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># output</span></span><br><span class="line"><span class="comment"># [1, 4, 4, 5, 7, 7, 8, 9, 9, 10]</span></span><br><span class="line"><span class="comment"># 0</span></span><br></pre></td></tr></table></figure>
-<p>变种二分法查找<br>给定一个排序的整数数组（升序）和一个要查找的整数target，用O(logn)的时间查找到target第一次出现的下标（从0开始），如果target不存在于数组中，返回-1。</p>
-<p>普通的二分查找只要找到target就行了，这个必须考虑到列表中重复的元素。<br>也就是说，即便找到了也不能跳出循环体。那么怎样才能跳出循环体呢？<br>别忘了跳出循环的方式有2种，刚才只是封住了第1种，还有第2种呢。即while的设置条件。很明显，start&lt;end是必须的循环条件的，而start&gt;end肯定是跳出循环的条件，那么start=end是跳出还是不跳出呢？首先要清楚start=end的意义是什么，即经过迭代此时列表nums中的选择区域变成了一个元素，循环的作用是将这最后一个元素选出来。<br>跳出循环，去判断是哪种可能。这个元素只有2种可能：不满足target或者是满足target的第一个元素。</p>
-<h3 id="可能一：不满足target的过程"><a href="#可能一：不满足target的过程" class="headerlink" title="可能一：不满足target的过程"></a>可能一：不满足target的过程</h3><p>注意，和普通二分法情况一样，循环到最后阶段一定是start=middle-1=end-2，即start与middle与end紧挨着。这时候，我们将start，middle，end代入if语句进行分析，<br>nums[middle] &gt; target,所以赋值end=middle-1，这时end且又和start相等<br>nums[middle] &lt; target,所以赋值start=middle+1，这时start且又和end相等<br>此时start=end，跳出循环，判断不满足target，需要return -1</p>
-<h3 id="可能二：满足target的第一个元素的过程"><a href="#可能二：满足target的第一个元素的过程" class="headerlink" title="可能二：满足target的第一个元素的过程"></a>可能二：满足target的第一个元素的过程</h3><p>如何确定是满足target的第一个元素？<br>先明白循环中找到第一个等于target的nums[middle]元素不跳出循环应该做什么。很明显，应该搜寻nums[start:middle]区域，所以要赋值end=middle，即搜寻新的nums[start:end]区域。再次循环，此时只剩下2种结果，再找到等于target的nums[middle] 或者 找不到了</p>
-<h4 id="结果1再找到等于target的nums-middle"><a href="#结果1再找到等于target的nums-middle" class="headerlink" title="结果1再找到等于target的nums[middle]"></a>结果1再找到等于target的nums[middle]</h4><p>第一步得到middle = (start + end) // 2<br>有target = nums[middle]<br>赋值end=middle<br>进入新的循环，搜寻新的nums[start:end]区域，依然面临2种结果</p>
-<h4 id="结果2再找不到等于target的nums-middle"><a href="#结果2再找不到等于target的nums-middle" class="headerlink" title="结果2再找不到等于target的nums[middle]"></a>结果2再找不到等于target的nums[middle]</h4><p>第一步得到middle = (start + end) // 2<br>一定有nums[middle] &lt; target而不是nums[middle] &gt; target,因为nums是递增的。<br>此时start = middle + 1<br>进入新的循环，搜寻新的nums[start:end]区域，依然面临2种结果</p>
-<p>2种结果互相交错，循环到最后阶段一定是start=middle-1=end-2，即start与middle与end紧挨着。这时候，我们将start，middle，end代入if语句进行分析，<br>nums[middle] &lt; target,所以赋值start=middle+1，这时start且又和end相等，此时start=end，跳出循环，判断nums[start] == target，需要return start。<br>nums[middle] = target,所以赋值end=middle，得到start=middle-1，再带入循环，有middle = (start + end) // 2，得到start=middle=end-1。<br>此时最后一步又分为二，1若nums[middle] &lt; target,所以赋值start=middle+1，这时start且又和end相等，此时start=end，跳出循环，判断nums[start] == target，需要return start。2若nums[middle] = target,所以赋值end=middle，得到start=middle=end，跳出循环，判断nums[start] == target，需要return start。</p>
-<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binarySearch</span><span class="params">(nums, target)</span>:</span></span><br><span class="line">   	start = <span class="number">0</span></span><br><span class="line">   	end = len(nums) <span class="number">-1</span></span><br><span class="line">   	<span class="keyword">while</span> start &lt; end:</span><br><span class="line">   		middle = (start + end) // <span class="number">2</span></span><br><span class="line">   		<span class="keyword">if</span> target &gt; nums[middle]:</span><br><span class="line">   			start = middle + <span class="number">1</span></span><br><span class="line">   		<span class="keyword">elif</span> target &lt; nums[middle]:</span><br><span class="line">   			end = middle - <span class="number">1</span></span><br><span class="line">   		<span class="keyword">else</span>:</span><br><span class="line">   			end = middle</span><br><span class="line">   	<span class="keyword">if</span> nums[start] == target:</span><br><span class="line">   		<span class="keyword">return</span> start </span><br><span class="line">   	<span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">   	List = [<span class="number">1</span>,<span class="number">4</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">9</span>,<span class="number">10</span>]</span><br><span class="line">   	print(List)</span><br><span class="line">   	print(binarySearch(List, <span class="number">4</span>))</span><br><span class="line"><span class="comment"># output</span></span><br><span class="line"><span class="comment"># [1, 4, 4, 5, 7, 7, 8, 9, 9, 10]</span></span><br><span class="line"><span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -531,7 +676,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="![](http://p5f0zxmos.bkt.clouddn.com/v2-ff9d1b0cb3c7be45eedef970c89fb140_r.jpg） 为什么会使用pyenv和pyenv-virtualenv插件?一般mac自带一个python版本，称为系统版本。对于开发者而言，肯定不够用啦。所以需要在同一个mac上组建不同的开发环境并且不会冲突。pyenv使你可以在不同python版本之">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MAC下pyenv和pyenv-virtualenv插件初探">
+<meta property="og:url" content="http://yoursite.com/2018/03/11/MAC下pyenv和pyenv-virtualenv插件初探/index.html">
+<meta property="og:site_name" content="La La Land">
+<meta property="og:description" content="![](http://p5f0zxmos.bkt.clouddn.com/v2-ff9d1b0cb3c7be45eedef970c89fb140_r.jpg） 为什么会使用pyenv和pyenv-virtualenv插件?一般mac自带一个python版本，称为系统版本。对于开发者而言，肯定不够用啦。所以需要在同一个mac上组建不同的开发环境并且不会冲突。pyenv使你可以在不同python版本之">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://p5f0zxmos.bkt.clouddn.com/v2-35ffe7dc265ad6756aad999d214e7cb6_hd.jpg">
+<meta property="og:image" content="http://p5f0zxmos.bkt.clouddn.com/v2-fb8fb71ab62aa5c85e8db201f4e2f5ac_hd.jpg">
+<meta property="og:updated_time" content="2018-03-11T14:37:32.449Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MAC下pyenv和pyenv-virtualenv插件初探">
+<meta name="twitter:description" content="![](http://p5f0zxmos.bkt.clouddn.com/v2-ff9d1b0cb3c7be45eedef970c89fb140_r.jpg） 为什么会使用pyenv和pyenv-virtualenv插件?一般mac自带一个python版本，称为系统版本。对于开发者而言，肯定不够用啦。所以需要在同一个mac上组建不同的开发环境并且不会冲突。pyenv使你可以在不同python版本之">
+<meta name="twitter:image" content="http://p5f0zxmos.bkt.clouddn.com/v2-35ffe7dc265ad6756aad999d214e7cb6_hd.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/11/MAC下pyenv和pyenv-virtualenv插件初探/"/>
+
+
+
+
+
+  <title>MAC下pyenv和pyenv-virtualenv插件初探 | La La Land</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">La La Land</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">日拱一卒，不期速成。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/11/MAC下pyenv和pyenv-virtualenv插件初探/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="奔跑的犀牛">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://p5f0zxmos.bkt.clouddn.com/image/rhino.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="La La Land">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MAC下pyenv和pyenv-virtualenv插件初探</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-11T19:13:32+08:00">
+                2018-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>![](<a href="http://p5f0zxmos.bkt.clouddn.com/v2-ff9d1b0cb3c7be45eedef970c89fb140_r.jpg）" target="_blank" rel="noopener">http://p5f0zxmos.bkt.clouddn.com/v2-ff9d1b0cb3c7be45eedef970c89fb140_r.jpg）</a></p>
+<h3 id="为什么会使用pyenv和pyenv-virtualenv插件"><a href="#为什么会使用pyenv和pyenv-virtualenv插件" class="headerlink" title="为什么会使用pyenv和pyenv-virtualenv插件?"></a>为什么会使用pyenv和pyenv-virtualenv插件?</h3><p>一般mac自带一个python版本，称为系统版本。对于开发者而言，肯定不够用啦。所以需要在同一个mac上组建不同的开发环境并且不会冲突。<br>pyenv使你可以在不同python版本之间轻松切换。它简单，低调，并且遵守UNIX的传统：single-purpose tools that do one thing well。<br>pyenv是基于rbenv和ruby-build项目，对python做了定制修改。<br>pyenv-virtualenv插件是虚拟出同一版本的python但是不同依赖库版本的开发环境。这对于在同一台电脑上开发不同项目非常方便。<br>pyenv是第三方的，开源的多版本的Python管理工具，同时支持Python2和Python3.<br><strong>等等，难道官方没有类似的工具吗？</strong><br>是有的，在Python3.3标准库中有一个venv模块就是干这个活的，但是，Python3.3之前的版本都不好用，鉴于现在很多项目是基于Python2.x的，所以……<br><strong>等等，似乎我还听说过virtualenv的东西也有类似的功能？</strong><br>virtualenv同时支持Python2和Python3，非常流行。它创建的虚拟环境可以指定Python解释器，并选择不继承基础版本的包。<br><strong>那我还是用virtualenv吧。</strong><br>是可以的，下面聊聊如何安装pyenv及其pyenv-virtualenv插件。</p>
+<p>###安装pyenv</p>
+<p>####通用版<br><strong>1.clone一个pyenv项目</strong><br><code>$ git clone https://github.com/pyenv/pyenv.git ~/.pyenv</code><br><strong>2.定义环境变量</strong><br><code>$ echo &#39;export PYENV_ROOT=&quot;$HOME/.pyenv&quot;&#39; &gt;&gt; ~/.bash_profile
+$ echo &#39;export PATH=&quot;$PYENV_ROOT/bin:$PATH&quot;&#39; &gt;&gt; ~/.bash_profile</code><br>对于zsh，使用~/.zshenv替换~/.bash_profile<br>对于Ubuntu和Fedora，~/.bashrc用替换~/.bash_profile<br><strong>3.增加pyenv init到shell</strong><br><code>$ echo &#39;eval &quot;$(pyenv init -)&quot;&#39; &gt;&gt; ~/.bash_profile</code><br>对于zsh，使用~/.zshenv替换~/.bash_profile<br>对于Ubuntu和Fedora，~/.bashrc用替换~/.bash_profile<br><strong>4.重启shell</strong><br><code>$ exec &quot;$SHELL&quot;</code><br><strong>5.安装Python版本</strong><br><code>$ pyenv install 3.6.2</code></p>
+<h4 id="Mac版"><a href="#Mac版" class="headerlink" title="Mac版"></a>Mac版</h4><p><strong>1.用homebrew安装</strong><br><code>$ brew update
+$ brew install pyenv</code><br><strong>2.按照通用版第3步开始安装</strong></p>
+<p>###安装pyenv-virtualenv插件</p>
+<p>####通用版<br><strong>1.clone一个pyenv项目</strong><br><code>$ git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv</code><br><strong>2.定义环境变量</strong><br><code>$ echo &#39;eval &quot;$(pyenv virtualenv-init -)&quot;&#39; &gt;&gt; ~/.bash_profile</code><br>对于zsh，使用~/.zshenv替换~/.bash_profile<br>对于Ubuntu和Fedora，~/.bashrc用替换~/.bash_profile<br><strong>3.重启shell</strong><br><code>$ exec &quot;$SHELL&quot;</code></p>
+<p>####Mac版<br><strong>1.用homebrew安装</strong><br><code>$ brew install pyenv-virtualenv</code><br><strong>2.同上第2步开始做</strong></p>
+<p>###卸载 pyenv</p>
+<h4 id="通用"><a href="#通用" class="headerlink" title="通用"></a>通用</h4><p><code>rm -rf $(pyenv root)</code></p>
+<p>####Mac<br><code>brew uninstall pyenv</code></p>
+<p>###安装并使用python版本<br><strong>1.查看可用的版本</strong><br><code>$ pyenv  install --list</code><br><strong>2.选择安装一个，如</strong><br><code>$ pyenv install 3.6.2</code></p>
+<blockquote>
+<p>小技巧： 执行上面命令后，会从给定的网址中下载安装文件Python-3.6.2.tar.xz。但由于文件很大，下载需要很久。建议做法是：先执行以上命令然后马上中断安装，这样就知道 pyenv 要下载的文件的链接。然后用户自己用其他更快的方式(比如wget、迅雷等等)从该链接中下载安装文件并将安装文件移动到 ~/.pyenv/cache 目录下(该目录默认不存在，用户要自行新建)，再执行上面的命令。编译安装本身也需要较长时间。默认安装路径是~/.pyenv/versions/3.6.2/</p>
+</blockquote>
+<p><strong>3.查看版本</strong><br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ pyenv versions  (查看所有版本)</span><br><span class="line">* system (<span class="built_in">set</span> by /root/.pyenv/version)</span><br><span class="line">  2.7.13 3.6.2</span><br><span class="line">$ pyenv version   (version 查看当前版本)</span><br><span class="line">system (<span class="built_in">set</span> by /root/.pyenv/version)</span><br></pre></td></tr></table></figure></p>
+<p>system 代表当前系统的python 版本<br>*表示当前的python版本， 可以看到， 我们还在使用的是默认的system 自带的python版本<br><strong>4.切换python默认版本</strong></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ pyenv global 3.6.2</span><br><span class="line">$ pyenv versions</span><br><span class="line">  system</span><br><span class="line">  2.7.1</span><br><span class="line">* 3.6.2 (<span class="built_in">set</span> by /root/.pyenv/version)</span><br></pre></td></tr></table></figure>
+<p><strong>5.创建一个3.6.2的虚拟环境</strong><br><code>$ pyenv virtualenv 3.6.2 env362</code><br>这条命令在本机上创建了一个名为env362python虚拟环境，这个环境的真实目录位于：~/.pyenv/versions/<br>再次输入<br><code>$ pyenv versions</code><br>如图所示</p>
+<p><img src="http://p5f0zxmos.bkt.clouddn.com/v2-35ffe7dc265ad6756aad999d214e7cb6_hd.jpg" alt=""></p>
+<p>env362是3.6.2/envs/env362的软连接<br>3.6.2是官方版本<br><strong>5.使用3.6.2的虚拟环境</strong><br><code>$ pyenv activate env362</code><br>如图所示</p>
+<p><img src="http://p5f0zxmos.bkt.clouddn.com/v2-fb8fb71ab62aa5c85e8db201f4e2f5ac_hd.jpg" alt=""></p>
+<p>下面基本上你就可以在这个虚拟环境里面为所欲为了，再也不用担心系统路径被搞乱的问题了。<br><strong>6.关闭3.6.2的虚拟环境</strong><br><code>$ pyenv deactivate</code><br><strong>7.卸载3.6.2的虚拟环境</strong><br><code>$ pyenv uninstall env362</code></p>
+<p>###在pycharm中使用虚拟环境<br>打开pycharm选择Preferences|Project interpreter|showall就可以选择了。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/11/hexo安装记录/" rel="next" title="hexo安装记录">
+                <i class="fa fa-chevron-left"></i> hexo安装记录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/11/二分法查找及变种分析/" rel="prev" title="二分法查找及变种分析">
+                二分法查找及变种分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://p5f0zxmos.bkt.clouddn.com/image/rhino.png"
+                alt="奔跑的犀牛" />
+            
+              <p class="site-author-name" itemprop="name">奔跑的犀牛</p>
+              <p class="site-description motion-element" itemprop="description">想和spiderman做朋友。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/KiwiShow" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么会使用pyenv和pyenv-virtualenv插件"><span class="nav-number">1.</span> <span class="nav-text">为什么会使用pyenv和pyenv-virtualenv插件?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Mac版"><span class="nav-number">1.1.</span> <span class="nav-text">Mac版</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通用"><span class="nav-number">1.2.</span> <span class="nav-text">通用</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">奔跑的犀牛</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
